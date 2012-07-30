@@ -20,3 +20,15 @@ The steps to debug an external program are:
 
 .. _PyDev: http://pydev.org/
 .. _remote debugger: http://pydev.org/manual_adv_remote_debugger.html
+
+ERIC4 Passive Debugging 
+-------------------------
+
+The Steps to activate passive debuging with ERIC4 are:
+
+- open Settings->Preferences->Debugging General
+- activate the option "Passive Debugger Enabled"
+- Restart the ERIC4 IDE
+- Load the Plugin-Project
+- Press the QGIS toolbar icon to activate passive debugging with eric4
+
