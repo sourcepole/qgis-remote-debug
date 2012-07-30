@@ -12,9 +12,9 @@ PyDev Debugging (Eclipse)
 
 The steps to debug an external program are:
 
-- Configure remote debugging of Exceptions (PyDev > Manage Exception Breakpoints)
-- Start the remote debugger server
 - Go to the debug perspective
+- Configure remote debugging of exceptions (PyDev > Manage Exception Breakpoints)
+- Start the debug server (PyDev > Start Debug Server)
 - Press the QGIS toolbar icon to activate remote debugging
 - The debugger is activated when a breakpoint is reached or an expception is raised (configureable) 
 

@@ -67,22 +67,30 @@ class RemoteDebug:
        self.iface.removeToolBarIcon(self.action)
 
     def startDebugging(self):
+        active = False
         #Eric4
         try:
             from dbg_client.DebugClient import DebugClient
             DBG=DebugClient()
-            DBG.startDebugger(host= 'localhost',filename = '', port= 42424,exceptions=True, enableTrace=True ,redirect=True)
+            DBG.startDebugger(host='localhost', filename='', port=42424, exceptions=True, enableTrace=True, redirect=True)
+            active = True
+            self._statusBar().showMessage(u"Eric4 debugging active")
         except:
             pass
         #PyDev (Eclipse)
         try:
             from pysrc import pydevd
             pydevd.settrace(port=5678, suspend=False)
+            active = True
+            self._statusBar().showMessage(u"PyDev debugging active")
         except:
             pass
-        
-    def stopDebugging(self):
-        pass        
+        if not active:
+            self._statusBar().showMessage(u"Debugging connection failed")
+
+    def _statusBar(self):
+        return self.iface.mainWindow().statusBar()
+
     # run method that performs all the real work
     def run(self):
             pass
