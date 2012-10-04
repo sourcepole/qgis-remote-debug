@@ -9,10 +9,10 @@
 
 
 [general]
-name=RemoteDebug
+name=Remote Debug
 qgisMinimumVersion=1.0
-description=RemoteDebug
-version=0.1
+description=Start Python remote debugger from QGIS plugin
+version=0.1.0
 
 # end of mandatory metadata
 
@@ -24,12 +24,12 @@ version=0.1
 # tags are comma separated with spaces allowed
 tags=
 
-homepage=
-tracker=
+homepage=https://github.com/sourcepole/qgis-remote-debug
+tracker=http://hub.qgis.org/projects/remotedebug/issues
 repository=https://github.com/sourcepole/qgis-remote-debug
 icon=icon.png
 # experimental flag
-experimental=False
+experimental=True
 
 # deprecated flag (applies to the whole plugin, not just a single version
 deprecated=False

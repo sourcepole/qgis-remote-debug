@@ -21,11 +21,13 @@
  This script initializes the plugin, making it known to QGIS.
 """
 def name():
-    return "Plugin to connect different IDE remote debugger"
+    return "Remote Debug"
 def description():
     return "Plugin to connect different IDE remote debugger"
 def version():
-    return "Version 0.1"
+    return "0.1.0"
+def experimental():
+    return True
 def icon():
     return "icon.png"
 def qgisMinimumVersion():
