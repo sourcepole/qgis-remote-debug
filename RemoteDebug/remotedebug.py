@@ -36,7 +36,7 @@ class RemoteDebug:
         self.plugin_dir = QFileInfo(QgsApplication.qgisUserDbFilePath()).path() + "/python/plugins/remotedebug"
         # initialize locale
         localePath = ""
-        locale = QSettings().value("locale/userLocale", type=str)
+        locale = QSettings().value("locale/userLocale", type=str)[0:2]
        
         if QFileInfo(self.plugin_dir).exists():
             localePath = self.plugin_dir + "/i18n/remotedebug_" + locale + ".qm"

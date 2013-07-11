@@ -43,16 +43,14 @@ class RemoteDebugTest:
         # Create action that will start plugin configuration
         self.action = QAction(
             QIcon(":/plugins/remotedebugtest/icon.png"),
-            u"RemoteDebugTest", self.iface.mainWindow())
+            u"Test", self.iface.mainWindow())
         # connect the action to the run method
         QObject.connect(self.action, SIGNAL("triggered()"), self.run)
 
-        # Add toolbar button and menu item
-        self.iface.addPluginToMenu(u"&RemoteDebugTest", self.action)
+        self.iface.addPluginToMenu(u"&Remote Debug", self.action)
 
     def unload(self):
-        # Remove the plugin menu item and icon
-        self.iface.removePluginMenu(u"&RemoteDebugTest", self.action)
+        self.iface.removePluginMenu(u"&Remote Debug", self.action)
 
     # run method that performs all the real work
     def run(self):
@@ -66,13 +64,9 @@ class RemoteDebugTest:
 
     def raiseException(self):
         #Local vars for testing value display in debugger
-        n01 = 42
-        n02 = 'fortytwo'
-        n03 = u'unitext'
-
         t01 = QgsApplication.pluginPath()
         t02 = QgsApplication.svgPaths()
-        t03 = QChar('x')
+        #t03 = QChar('x')
         t05 = QPoint()
         t06 = QPointF()
         t07 = QRect()
@@ -88,7 +82,7 @@ class RemoteDebugTest:
         t18 = QUrl()
         t19 = QModelIndex()
         t20 = QRegExp()
-        #t21 = QAction()
+        t21 = self.action
         #t22 = QKeySequence()
         #t23 = QDomAttr()
         #t24 = QDomCharacterData()
@@ -102,5 +96,9 @@ class RemoteDebugTest:
 
         #QVariant tests
         tv01 = QSettings().value("locale/userLocale")
+
+        x01 = 42
+        x02 = 'fortytwo'
+        x03 = u'unitext'
 
         raise Exception('Exception raised. Check local variables in your debugger.')

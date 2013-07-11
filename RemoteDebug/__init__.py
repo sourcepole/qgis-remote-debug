@@ -32,6 +32,8 @@ def icon():
     return "icon.png"
 def qgisMinimumVersion():
     return "1.8"
+def qgisMaximumVersion():
+    return "2.99"
 def classFactory(iface):
     # load RemoteDebug class from file RemoteDebug
     from remotedebug import RemoteDebug
