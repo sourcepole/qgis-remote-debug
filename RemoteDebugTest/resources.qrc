@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/remotedebugtest" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
