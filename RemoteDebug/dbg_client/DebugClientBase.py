@@ -1475,11 +1475,11 @@ class DebugClientBase(object):
             c, m, y, k, a = value.getCmyk()
             varlist.append(("cmyk", "int", "%d, %d, %d, %d, %d" % (c, m, y, k, a)))
         elif qttype == 'QDate':
-            varlist.append(("", "QDate", "%s" % unicode(value.toString())))
+            varlist.append(("", "QDate", "%s" % unicode(value)))
         elif qttype == 'QTime':
-            varlist.append(("", "QTime", "%s" % unicode(value.toString())))
+            varlist.append(("", "QTime", "%s" % unicode(value)))
         elif qttype == 'QDateTime':
-            varlist.append(("", "QDateTime", "%s" % unicode(value.toString())))
+            varlist.append(("", "QDateTime", "%s" % unicode(value)))
         elif qttype == 'QDir':
             varlist.append(("path", "QString", "%s" % unicode(value.path())))
             varlist.append(("absolutePath", "QString", "%s" % \
@@ -1495,7 +1495,7 @@ class DebugClientBase(object):
             varlist.append(("bold", "bool", "%s" % value.bold()))
             varlist.append(("italic", "bool", "%s" % value.italic()))
         elif qttype == 'QUrl':
-            varlist.append(("url", "QString", "%s" % unicode(value.toString())))
+            varlist.append(("url", "QString", "%s" % unicode(value)))
             varlist.append(("scheme", "QString", "%s" % unicode(value.scheme())))
             varlist.append(("user", "QString", "%s" % unicode(value.userName())))
             varlist.append(("password", "QString", "%s" % unicode(value.password())))
@@ -1521,9 +1521,9 @@ class DebugClientBase(object):
             varlist.append(("tooltip", "QString", "%s" % unicode(value.toolTip())))
             varlist.append(("whatsthis", "QString", "%s" % unicode(value.whatsThis())))
             varlist.append(("shortcut", "QString", "%s" % \
-                unicode(value.shortcut().toString())))
+                unicode(value.shortcut())))
         elif qttype == 'QKeySequence':
-            varlist.append(("value", "", "%s" % unicode(value.toString())))
+            varlist.append(("value", "", "%s" % unicode(value)))
             
         # XML stuff
         elif qttype == 'QDomAttr':
@@ -1534,7 +1534,7 @@ class DebugClientBase(object):
         elif qttype == 'QDomComment':
             varlist.append(("data", "QString", "%s" % unicode(value.data())))
         elif qttype == "QDomDocument":
-            varlist.append(("text", "QString", "%s" % unicode(value.toString())))
+            varlist.append(("text", "QString", "%s" % unicode(value)))
         elif qttype == 'QDomElement':
             varlist.append(("tagName", "QString", "%s" % unicode(value.tagName())))
             varlist.append(("text", "QString", "%s" % unicode(value.text())))
@@ -1543,7 +1543,7 @@ class DebugClientBase(object):
             
         # Networking stuff
         elif qttype == 'QHostAddress':
-            varlist.append(("address", "QHostAddress", "%s" % unicode(value.toString())))
+            varlist.append(("address", "QHostAddress", "%s" % unicode(value)))
             
         return varlist
         
