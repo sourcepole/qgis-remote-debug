@@ -127,7 +127,7 @@ class DefaultResolver:
                 declaredFields = obj.getDeclaredFields()
                 for i in range(len(declaredMethods)):
                     name = declaredMethods[i].getName()
-                    ret[name] = declaredMethods[i]
+                    ret[name] = declaredMethods[i].toString()
                     found.put(name, 1)
 
                 for i in range(len(declaredFields)):
@@ -139,7 +139,7 @@ class DefaultResolver:
                     try:
                         ret[name] = declaredFields[i].get(original)
                     except:
-                        ret[name] = declaredFields[i]
+                        ret[name] = declaredFields[i].toString()
 
         #this simple dir does not always get all the info, that's why we have the part before
         #(e.g.: if we do a dir on String, some methods that are from other interfaces such as 
