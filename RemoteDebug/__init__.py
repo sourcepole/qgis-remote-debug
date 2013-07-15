@@ -20,20 +20,6 @@
  ***************************************************************************/
  This script initializes the plugin, making it known to QGIS.
 """
-def name():
-    return "Remote Debug"
-def description():
-    return "Plugin to connect different IDE remote debugger"
-def version():
-    return "0.1.0"
-def experimental():
-    return True
-def icon():
-    return "icon.png"
-def qgisMinimumVersion():
-    return "1.8"
-def qgisMaximumVersion():
-    return "2.99"
 def classFactory(iface):
     # load RemoteDebug class from file RemoteDebug
     from remotedebug import RemoteDebug

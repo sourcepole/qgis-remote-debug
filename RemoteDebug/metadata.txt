@@ -10,20 +10,22 @@
 
 [general]
 name=Remote Debug
-qgisMinimumVersion=1.0
+qgisMinimumVersion=1.8
 qgisMaximumVersion=2.99
 description=Start Python remote debugger from QGIS plugin
-version=0.1.0
+version=0.2.0
 
 # end of mandatory metadata
 
 # Optional items:
 
-# Uncomment the following line and add your changelog entries:
-# changelog=
+changelog=0.2.0
+        -Compatibility with SIP API V2
+    0.1.0
+    -First release
 
 # tags are comma separated with spaces allowed
-tags=
+tags=debugging,development,tools
 
 homepage=https://github.com/sourcepole/qgis-remote-debug
 tracker=http://hub.qgis.org/projects/remotedebug/issues
@@ -36,5 +38,5 @@ experimental=True
 deprecated=False
 
 # Author contact information
-author=Dr. Horst Düster / Pirmin Kalberer /Sourcepole AG
-email=horst.duester@sourcepole.ch
+author=Pirmin Kalberer & Dr. Horst Düster, Sourcepole AG
+email=pka@sourcepole.ch
