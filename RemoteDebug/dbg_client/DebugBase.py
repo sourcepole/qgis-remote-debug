@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2002 - 2011 Detlev Offenbach <detlev@die-offenbachs.de>
+# Copyright (c) 2002 - 2013 Detlev Offenbach <detlev@die-offenbachs.de>
 #
 
 """
@@ -142,7 +142,7 @@ class DebugBase(bdb.Bdb):
     
     def profile(self, frame, event, arg):
         """
-        Public method used to trace some stuff independant of the debugger 
+        Public method used to trace some stuff independent of the debugger 
         trace function.
         
         @param frame The current stack frame.
@@ -579,6 +579,11 @@ class DebugBase(bdb.Bdb):
         """
         if exctype in [SystemExit, bdb.BdbQuit]:
             atexit._run_exitfuncs()
+            if excval is None:
+                excval = 0
+            elif isinstance(excval, (unicode, str)):
+                self._dbgClient.write(excval)
+                excval = 1
             if isinstance(excval, int):
                 self._dbgClient.progTerminated(excval)
             else:
@@ -618,6 +623,8 @@ class DebugBase(bdb.Bdb):
                 frlist.reverse()
                 
                 self.currentFrame = frlist[0]
+                self.currentFrameLocals = frlist[0].f_locals
+                # remember the locals because it is reinitialized when accessed
                 
                 for fr in frlist:
                     filename = self._dbgClient.absPath(self.fix_frame_filename(fr))

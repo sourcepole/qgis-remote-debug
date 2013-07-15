@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2002 - 2011 Detlev Offenbach <detlev@die-offenbachs.de>
+# Copyright (c) 2002 - 2013 Detlev Offenbach <detlev@die-offenbachs.de>
 #
 
 """
@@ -17,6 +17,7 @@ import time
 import imp
 import re
 import distutils.sysconfig
+import atexit
 
 
 from DebugProtocol import *
@@ -202,7 +203,7 @@ class DebugClientBase(object):
         self.localsFilterObjects = []
 
         self.pendingResponse = ResponseOK
-        self.fncache = {}
+        self._fncache = {}
         self.dircache = []
         self.inRawMode = 0
         self.mainProcStr = None     # used for the passive mode
@@ -463,7 +464,7 @@ class DebugClientBase(object):
                 return
 
             if cmd == RequestLoad:
-                self.fncache = {}
+                self._fncache = {}
                 self.dircache = []
                 sys.argv = []
                 wd, fn, args, tracePython = arg.split('|')
@@ -474,8 +475,7 @@ class DebugClientBase(object):
                     pass
                 sys.argv.append(fn)
                 sys.argv.extend(eval(args))
-                sys.path[0] = os.path.dirname(sys.argv[0])
-                sys.path.insert(0, '')
+                sys.path = self.__getSysPath(os.path.dirname(sys.argv[0]))
                 if wd == '':
                     os.chdir(sys.path[1])
                 else:
@@ -520,8 +520,7 @@ class DebugClientBase(object):
                     pass
                 sys.argv.append(fn)
                 sys.argv.extend(eval(args))
-                sys.path[0] = os.path.dirname(sys.argv[0])
-                sys.path.insert(0, '')
+                sys.path = self.__getSysPath(os.path.dirname(sys.argv[0]))
                 if wd == '':
                     os.chdir(sys.path[1])
                 else:
@@ -543,8 +542,14 @@ class DebugClientBase(object):
                 
                 self.debugMod.__dict__['__file__'] = sys.argv[0]
                 sys.modules['__main__'] = self.debugMod
-                execfile(sys.argv[0], self.debugMod.__dict__)
+                res = 0
+                try:
+                    execfile(sys.argv[0], self.debugMod.__dict__)
+                except SystemExit as exc:
+                    res = exc.code
+                    atexit._run_exitfuncs()
                 self.writestream.flush()
+                self.progTerminated(res)
                 return
 
             if cmd == RequestCoverage:
@@ -558,8 +563,7 @@ class DebugClientBase(object):
                     pass
                 sys.argv.append(fn)
                 sys.argv.extend(eval(args))
-                sys.path[0] = os.path.dirname(sys.argv[0])
-                sys.path.insert(0, '')
+                sys.path = self.__getSysPath(os.path.dirname(sys.argv[0]))
                 if wd == '':
                     os.chdir(sys.path[1])
                 else:
@@ -578,11 +582,18 @@ class DebugClientBase(object):
                     self.cover.erase()
                 sys.modules['__main__'] = self.debugMod
                 self.debugMod.__dict__['__file__'] = sys.argv[0]
+                self.running = sys.argv[0]
+                res = 0
                 self.cover.start()
-                execfile(sys.argv[0], self.debugMod.__dict__)
+                try:
+                    execfile(sys.argv[0], self.debugMod.__dict__)
+                except SystemExit as exc:
+                    res = exc.code
+                    atexit._run_exitfuncs()
                 self.cover.stop()
                 self.cover.save()
                 self.writestream.flush()
+                self.progTerminated(res)
                 return
 
             if cmd == RequestProfile:
@@ -597,8 +608,7 @@ class DebugClientBase(object):
                     pass
                 sys.argv.append(fn)
                 sys.argv.extend(eval(args))
-                sys.path[0] = os.path.dirname(sys.argv[0])
-                sys.path.insert(0, '')
+                sys.path = self.__getSysPath(os.path.dirname(sys.argv[0]))
                 if wd == '':
                     os.chdir(sys.path[1])
                 else:
@@ -615,9 +625,16 @@ class DebugClientBase(object):
                     self.prof.erase()
                 self.debugMod.__dict__['__file__'] = sys.argv[0]
                 sys.modules['__main__'] = self.debugMod
-                self.prof.run('execfile(%r)' % sys.argv[0])
+                self.running = sys.argv[0]
+                res = 0
+                try:
+                    self.prof.run('execfile(%r)' % sys.argv[0])
+                except SystemExit as exc:
+                    res = exc.code
+                    atexit._run_exitfuncs()
                 self.prof.save()
                 self.writestream.flush()
+                self.progTerminated(res)
                 return
 
             if cmd == RequestShutdown:
@@ -879,8 +896,6 @@ class DebugClientBase(object):
             sys.last_type, sys.last_value, sys.last_traceback = sys.exc_info()
             map(self.write,traceback.format_exception_only(sys.last_type,sys.last_value))
             self.buffer = ''
-
-            self.__exceptionRaised()
         else:
             if code is None:
                 self.pendingResponse = ResponseContinue
@@ -943,8 +958,6 @@ class DebugClientBase(object):
                         tblist = tb = None
 
                     map(self.write, list)
-
-                    self.__exceptionRaised()
 
     def __clientCapabilities(self):
         """
@@ -1074,12 +1087,20 @@ class DebugClientBase(object):
         if remoteAddress is None:                               # default: 127.0.0.1
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((DebugAddress, port))
-        elif ":" in remoteAddress:                              # IPv6
-            sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-            sock.connect((remoteAddress, port))
-        else:                                                   # IPv4
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.connect((remoteAddress, port))
+        else:
+            if "@@i" in remoteAddress:
+                remoteAddress, index = remoteAddress.split("@@i")
+            else:
+                index = 0
+            if ":" in remoteAddress:                              # IPv6
+                sockaddr = socket.getaddrinfo(
+                    remoteAddress, port, 0, 0, socket.SOL_TCP)[0][-1]
+                sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+                sockaddr = sockaddr[:-1] + (int(index),)
+                sock.connect(sockaddr)
+            else:                                                   # IPv4
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.connect((remoteAddress, port))
 
         self.readstream = AsyncFile(sock, sys.stdin.mode, sys.stdin.name)
         self.writestream = AsyncFile(sock, sys.stdout.mode, sys.stdout.name)
@@ -1118,16 +1139,16 @@ class DebugClientBase(object):
             return fn
 
         # Check the cache.
-        if self.fncache.has_key(fn):
-            return self.fncache[fn]
+        if self._fncache.has_key(fn):
+            return self._fncache[fn]
 
         # Search sys.path.
         for p in sys.path:
             afn = os.path.abspath(os.path.join(p,fn))
-            afn = os.path.normcase(afn)
+            nafn = os.path.normcase(afn)
 
-            if os.path.exists(afn):
-                self.fncache[fn] = afn
+            if os.path.exists(nafn):
+                self._fncache[fn] = afn
                 d = os.path.dirname(afn)
                 if (d not in sys.path) and (d not in self.dircache):
                     self.dircache.append(d)
@@ -1136,10 +1157,10 @@ class DebugClientBase(object):
         # Search the additional directory cache
         for p in self.dircache:
             afn = os.path.abspath(os.path.join(p,fn))
-            afn = os.path.normcase(afn)
+            nafn = os.path.normcase(afn)
             
-            if os.path.exists(afn):
-                self.fncache[fn] = afn
+            if os.path.exists(nafn):
+                self._fncache[fn] = afn
                 return afn
                 
         # Nothing found.
@@ -1159,6 +1180,11 @@ class DebugClientBase(object):
         afn = self.absPath(fn)
         for d in self.skipdirs:
             if afn.startswith(d):
+                return 1
+        
+        # special treatment for paths containing site-packages or dist-packages
+        for part in ["site-packages", "dist-packages"]:
+            if part in afn:
                 return 1
         
         return 0
@@ -1203,6 +1229,9 @@ class DebugClientBase(object):
         @param scope 1 to report global variables, 0 for local variables (int)
         @param filter the indices of variable types to be filtered (list of int)
         """
+        if self.currentThread is None:
+            return
+        
         if scope == 0:
             self.framenr = frmnr
         
@@ -1242,6 +1271,9 @@ class DebugClientBase(object):
         @param scope 1 to report global variables, 0 for local variables (int)
         @param filter the indices of variable types to be filtered (list of int)
         """
+        if self.currentThread is None:
+            return
+        
         f = self.currentThread.getCurrentFrame()
         
         while f is not None and frmnr > 0:
@@ -1272,6 +1304,10 @@ class DebugClientBase(object):
             access = ""
             oaccess = ""
             odict = dict
+            
+            qtVariable = False
+            qvar = None
+            qvtype = ""
             
             while i < len(var):
                 if len(dict):
@@ -1337,9 +1373,16 @@ class DebugClientBase(object):
                         try:
                             exec 'mdict = dict%s.__dict__' % access
                             ndict.update(mdict)
+                            exec 'obj = dict%s' % access
+                            if "PyQt4." in str(type(obj)):
+                                qtVariable = True
+                                qvar = obj
+                                qvtype = ("%s" % type(qvar))[1:-1].split()[1][1:-1]
+                        except:
+                            pass
+                        try:
                             exec 'mcdict = dict%s.__class__.__dict__' % access
                             ndict.update(mcdict)
-                            exec 'obj = dict%s' % access
                             if mdict and not "sipThis" in mdict.keys():
                                 del rvar[0:2]
                                 access = ""
@@ -1356,6 +1399,10 @@ class DebugClientBase(object):
                             ndict.update(cdict)
                             exec 'obj = dict%s' % access
                             access = ""
+                            if "PyQt4." in str(type(obj)):
+                                qtVariable = True
+                                qvar = obj
+                                qvtype = ("%s" % type(qvar))[1:-1].split()[1][1:-1]
                         except:
                             pass
                     else:
@@ -1364,6 +1411,10 @@ class DebugClientBase(object):
                             ndict.update(dict[var[i]].__class__.__dict__)
                             del rvar[0]
                             obj = dict[var[i]]
+                            if "PyQt4." in str(type(obj)):
+                                qtVariable = True
+                                qvar = obj
+                                qvtype = ("%s" % type(qvar))[1:-1].split()[1][1:-1]
                         except:
                             pass
                         try:
@@ -1376,13 +1427,19 @@ class DebugClientBase(object):
                                     pass
                             ndict.update(cdict)
                             obj = dict[var[i]]
+                            if "PyQt4." in str(type(obj)):
+                                qtVariable = True
+                                qvar = obj
+                                qvtype = ("%s" % type(qvar))[1:-1].split()[1][1:-1]
                         except:
                             pass
                     odict = dict
                     dict = ndict
                 i += 1
             
-            if ("sipThis" in dict.keys() and len(dict) == 1) or \
+            if qtVariable:
+                vlist = self.__formatQt4Variable(qvar, qvtype)
+            elif ("sipThis" in dict.keys() and len(dict) == 1) or \
                (len(dict) == 0 and len(udict) > 0):
                 if access:
                     exec 'qvar = udict%s' % access
@@ -1397,30 +1454,49 @@ class DebugClientBase(object):
                 else:
                     vlist = []
             else:
-                # format the dictionary found
-                if dictkeys is None:
-                    dictkeys = dict.keys()
-                else:
-                    # treatment for sequences and dictionaries
+                qtVariable = False
+                if len(dict) == 0 and len(udict) > 0:
                     if access:
-                        exec "dict = dict%s" % access
+                        exec 'qvar = udict%s' % access
+                    # this has to be in line with VariablesViewer.indicators
+                    elif rvar and rvar[0][-2:] in ["[]", "()", "{}"]:
+                        exec 'qvar = udict["%s"][%s]' % (rvar[0][:-2], rvar[1])
                     else:
-                        dict = dict[dictkeys[0]]
-                    if isDict:
+                        qvar = udict[var[-1]]
+                    qvtype = ("%s" % type(qvar))[1:-1].split()[1][1:-1]
+                    if qvtype.startswith("PyQt4"):
+                        qtVariable = True
+                
+                if qtVariable:
+                    vlist = self.__formatQt4Variable(qvar, qvtype)
+                else:
+                    # format the dictionary found
+                    if dictkeys is None:
                         dictkeys = dict.keys()
                     else:
-                        dictkeys = range(len(dict))
-                vlist = self.__formatVariablesList(dictkeys, dict, scope, filter, 
-                                                 formatSequences)
+                        # treatment for sequences and dictionaries
+                        if access:
+                            exec "dict = dict%s" % access
+                        else:
+                            dict = dict[dictkeys[0]]
+                        if isDict:
+                            dictkeys = dict.keys()
+                        else:
+                            dictkeys = range(len(dict))
+                    vlist = self.__formatVariablesList(dictkeys, dict, scope, filter, 
+                                                     formatSequences)
             varlist.extend(vlist)
         
             if obj is not None and not formatSequences:
-                if unicode(repr(obj)).startswith('{'):
-                    varlist.append(('...', 'dict', "%d" % len(obj.keys())))
-                elif unicode(repr(obj)).startswith('['):
-                    varlist.append(('...', 'list', "%d" % len(obj)))
-                elif unicode(repr(obj)).startswith('('):
-                    varlist.append(('...', 'tuple', "%d" % len(obj)))
+                try:
+                    if unicode(repr(obj)).startswith('{'):
+                        varlist.append(('...', 'dict', "%d" % len(obj.keys())))
+                    elif unicode(repr(obj)).startswith('['):
+                        varlist.append(('...', 'list', "%d" % len(obj)))
+                    elif unicode(repr(obj)).startswith('('):
+                        varlist.append(('...', 'tuple', "%d" % len(obj)))
+                except:
+                    pass
         
         self.write('%s%s\n' % (ResponseVariable, unicode(varlist)))
         
@@ -1439,8 +1515,13 @@ class DebugClientBase(object):
         if qttype == 'QString':
             varlist.append(("", "QString", "%s" % unicode(value)))
         elif qttype == 'QStringList':
-            for s in value:
-                varlist.append(("", "QString", "%s" % unicode(s)))
+            for i in range(value.count()):
+                varlist.append(("%d" % i, "QString", "%s" % unicode(value[i])))
+        elif qttype == 'QByteArray':
+            varlist.append(("hex", "QByteArray", "%s" % value.toHex()))
+            varlist.append(("base64", "QByteArray", "%s" % value.toBase64()))
+            varlist.append(("percent encoding", "QByteArray",
+                            "%s" % value.toPercentEncoding()))
         elif qttype == 'QChar':
             varlist.append(("", "QChar", "%s" % unichr(value.unicode())))
             varlist.append(("", "int", "%d" % value.unicode()))
@@ -1615,7 +1696,14 @@ class DebugClientBase(object):
                         if valtype == "classobj":
                             if ConfigVarTypeStrings.index('instance') in filter:
                                 continue
-                        elif ConfigVarTypeStrings.index('other') in filter:
+                        elif valtype == "sip.methoddescriptor":
+                            if ConfigVarTypeStrings.index('instance method') in filter:
+                                continue
+                        elif valtype == "sip.enumtype":
+                            if ConfigVarTypeStrings.index('class') in filter:
+                                continue
+                        elif not valtype.startswith("PySide") and \
+                             ConfigVarTypeStrings.index('other') in filter:
                             continue
                     
                 try:
@@ -1731,7 +1819,7 @@ class DebugClientBase(object):
         self.__interact()
         
         # setup the debugger variables
-        self.fncache = {}
+        self._fncache = {}
         self.dircache = []
         self.mainFrame = None
         self.inRawMode = 0
@@ -1770,12 +1858,11 @@ class DebugClientBase(object):
         remoteAddress = self.__resolveHost(host)
         self.connectDebugger(port, remoteAddress, redirect)
         
-        self.fncache = {}
+        self._fncache = {}
         self.dircache = []
         sys.argv = progargs[:]
         sys.argv[0] = os.path.abspath(sys.argv[0])
-        sys.path[0] = os.path.dirname(sys.argv[0])
-        sys.path.insert(0, '')
+        sys.path = self.__getSysPath(os.path.dirname(sys.argv[0]))
         if wd == '':
             os.chdir(sys.path[1])
         else:
@@ -1861,7 +1948,7 @@ class DebugClientBase(object):
                     del args[0]
                     del args[0]
                 elif args[0] == '-p':
-                    port = long(args[1])
+                    port = int(args[1])
                     del args[0]
                     del args[0]
                 elif args[0] == '-w':
@@ -1879,6 +1966,14 @@ class DebugClientBase(object):
                     del args[0]
                 elif args[0] == '--no-encoding':
                     self.noencoding = True
+                    del args[0]
+                elif args[0] == '--fork-child':
+                    self.fork_auto = True
+                    self.fork_child = True
+                    del args[0]
+                elif args[0] == '--fork-parent':
+                    self.fork_auto = True
+                    self.fork_child = False
                     del args[0]
                 elif args[0] == '--':
                     del args[0]
@@ -1904,7 +1999,7 @@ class DebugClientBase(object):
             if sys.argv[1] == '':
                 del sys.argv[1]
             try:
-                port = long(sys.argv[1])
+                port = int(sys.argv[1])
             except (ValueError, IndexError):
                 port = -1
             try:
@@ -1971,3 +2066,19 @@ class DebugClientBase(object):
             return
         
         DebugClientOrigClose(fd)
+        
+    def __getSysPath(self, firstEntry):
+        """
+        Private slot to calculate a path list including the PYTHONPATH 
+        environment variable.
+        
+        @param firstEntry entry to be put first in sys.path (string)
+        @return path list for use as sys.path (list of strings)
+        """
+        sysPath = [path for path in os.environ.get("PYTHONPATH", "").split(os.pathsep) 
+                   if path not in sys.path] + sys.path[:]
+        if "" in sysPath:
+            sysPath.remove("")
+        sysPath.insert(0, firstEntry)
+        sysPath.insert(0, '')
+        return sysPath

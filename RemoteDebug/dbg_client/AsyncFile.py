@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2002 - 2011 Detlev Offenbach <detlev@die-offenbachs.de>
+# Copyright (c) 2002 - 2013 Detlev Offenbach <detlev@die-offenbachs.de>
 #
 
 """
@@ -49,6 +49,7 @@ class AsyncFile(object):
         self.mode = mode
         self.name = name
         self.nWriteErrors = 0
+        self.encoding = "utf-8"
 
         self.wpending = u''
 
@@ -74,7 +75,7 @@ class AsyncFile(object):
             try :
                 buf = "%s%s" % (self.wpending[:n], EOT)
                 try:
-                    buf = buf.encode('utf8')
+                    buf = buf.encode('utf-8')
                 except (UnicodeEncodeError, UnicodeDecodeError):
                     pass
                 self.sock.sendall(buf)
