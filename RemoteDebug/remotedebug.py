@@ -27,6 +27,7 @@ from qgis.core import *
 import resources_rc
 # Import the code for the dialog
 
+
 class RemoteDebug:
 
     def __init__(self, iface):
@@ -37,7 +38,7 @@ class RemoteDebug:
         # initialize locale
         localePath = ""
         locale = QSettings().value("locale/userLocale", type=str)[0:2]
-       
+
         if QFileInfo(self.plugin_dir).exists():
             localePath = self.plugin_dir + "/i18n/remotedebug_" + locale + ".qm"
 
@@ -47,7 +48,6 @@ class RemoteDebug:
 
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
-   
 
     def initGui(self):
         # Create action that will start plugin configuration
@@ -61,7 +61,7 @@ class RemoteDebug:
 
     def unload(self):
         # Remove the plugin menu item and icon
-        self.iface.removePluginMenu(u"&Remote Debug",self.action)
+        self.iface.removePluginMenu(u"&Remote Debug", self.action)
         self.iface.removeToolBarIcon(self.action)
 
     def startDebugging(self):
@@ -69,7 +69,7 @@ class RemoteDebug:
         #Eric4
         try:
             from dbg_client.DebugClient import DebugClient
-            DBG=DebugClient()
+            DBG = DebugClient()
             DBG.startDebugger(host='localhost', filename='', port=42424, exceptions=True, enableTrace=True, redirect=True)
             active = True
             self._statusBar().showMessage(u"Eric4 debugging active")
