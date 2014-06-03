@@ -65,26 +65,47 @@ class RemoteDebug:
         self.iface.removeToolBarIcon(self.action)
 
     def startDebugging(self):
-        active = False
-        #Eric4
+        active = self.startEricClient()
+        if not active:
+            active = self.startPyDevClient()
+        if not active:
+            active = self.startWindPDBClient()
+        if not active:
+            self._statusBar().showMessage(u"Debugging connection failed")
+
+    def startEricClient(self):
+        started = False
         try:
             from dbg_client.DebugClient import DebugClient
             DBG = DebugClient()
             DBG.startDebugger(host='localhost', filename='', port=42424, exceptions=True, enableTrace=True, redirect=True)
-            active = True
+            started = True
             self._statusBar().showMessage(u"Eric4 debugging active")
         except:
             pass
-        #PyDev (Eclipse)
+        return started
+
+    def startPyDevClient(self):
+        started = False
         try:
             from pysrc import pydevd
             pydevd.settrace(port=5678, suspend=False)
-            active = True
+            started = True
             self._statusBar().showMessage(u"PyDev debugging active")
         except:
             pass
-        if not active:
-            self._statusBar().showMessage(u"Debugging connection failed")
+        return started
+
+    def startWindPDBClient(self):
+        started = False
+        try:
+            import rpdb2
+            rpdb2.start_embedded_debugger('qgis', timeout=10.0)
+            started = True
+            self._statusBar().showMessage(u"WinPDB debugging active")
+        except:
+            pass
+        return started
 
     def _statusBar(self):
         return self.iface.mainWindow().statusBar()
