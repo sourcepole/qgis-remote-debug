@@ -13,13 +13,16 @@ name=Remote Debug
 qgisMinimumVersion=1.8
 qgisMaximumVersion=2.99
 description=Start Python remote debugger from QGIS plugin
-version=0.2.0
+version=0.3.0
 
 # end of mandatory metadata
 
 # Optional items:
 
-changelog=0.2.0
+changelog=0.3.0
+        -Initial WinPDB support
+        -PyDev updated
+    0.2.0
         -Compatibility with SIP API V2
     0.1.0
     -First release

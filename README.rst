@@ -33,6 +33,7 @@ The steps to activate embedded debugging with WinPDB are:
 - open File->Attach
 - Set password: "qgis"
 - Press the QGIS toolbar icon to activate embedded debugging
+- Double click on source file in debugger
 - Control->Go in Debugger
 
 Debugger is activated on an exception.
@@ -44,7 +45,7 @@ You can enter a plugin with the following steps:
 .. _WinPDB: http://winpdb.org/
 
 
-ERIC4 Passive Debugging 
+ERIC4 Passive Debugging
 -----------------------
 
 The steps to activate passive debugging with ERIC4 are:
