@@ -21,17 +21,19 @@
  ***************************************************************************/
 """
 
+import sys
+
 
 class DebuggerClient:
     """Base class for Debugger clients"""
 
-    def start_debugging(self):
+    def start_debugging(self, config=None):
         raise NotImplementedError
 
 
 class EricClient(DebuggerClient):
 
-    def start_debugging(self):
+    def start_debugging(self, config=None):
         started = False
         try:
             from dbg_client.DebugClient import DebugClient
@@ -47,10 +49,11 @@ class EricClient(DebuggerClient):
 
 class PyDevClient(DebuggerClient):
 
-    def start_debugging(self):
+    def start_debugging(self, config):
         started = False
         try:
-            from pysrc import pydevd
+            sys.path.append(config['pydev_path'])
+            import pydevd
             pydevd.settrace(port=5678, suspend=False)
             started = True
         except:
@@ -60,7 +63,7 @@ class PyDevClient(DebuggerClient):
 
 class WinPDBClient(DebuggerClient):
 
-    def start_debugging(self):
+    def start_debugging(self, config=None):
         started = False
         try:
             import rpdb2

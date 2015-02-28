@@ -186,7 +186,7 @@ class RemoteDebug:
         debugger = self.debugger.client(
             self.dlg.debugger_cbox.currentIndex())
         self._statusBar().showMessage(u"Connecting to remote debugger...")
-        active = debugger.start_debugging()
+        active = debugger.start_debugging(self.dlg.debugger_config())
         self._statusBar().showMessage("")
         if active:
             self._push_message(
