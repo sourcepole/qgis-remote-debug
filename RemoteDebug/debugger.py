@@ -22,53 +22,62 @@
 """
 
 
-class Debugger:
+class DebuggerClient:
+    """Base class for Debugger clients"""
 
-    def __init__(self, iface):
-        self.iface = iface
+    def start_debugging(self):
+        raise NotImplementedError
 
-    def startDebugging(self):
-        active = self.startEricClient()
-        if not active:
-            active = self.startPyDevClient()
-        if not active:
-            active = self.startWindPDBClient()
-        if not active:
-            self._statusBar().showMessage(u"Debugging connection failed")
 
-    def startEricClient(self):
+class EricClient(DebuggerClient):
+
+    def start_debugging(self):
         started = False
         try:
             from dbg_client.DebugClient import DebugClient
             DBG = DebugClient()
-            DBG.startDebugger(host='localhost', filename='', port=42424, exceptions=True, enableTrace=True, redirect=True)
+            DBG.startDebugger(
+                host='localhost', filename='', port=42424,
+                exceptions=True, enableTrace=True, redirect=True)
             started = True
-            self._statusBar().showMessage(u"Eric4 debugging active")
         except:
             pass
         return started
 
-    def startPyDevClient(self):
+
+class PyDevClient(DebuggerClient):
+
+    def start_debugging(self):
         started = False
         try:
             from pysrc import pydevd
             pydevd.settrace(port=5678, suspend=False)
             started = True
-            self._statusBar().showMessage(u"PyDev debugging active")
         except:
             pass
         return started
 
-    def startWindPDBClient(self):
+
+class WinPDBClient(DebuggerClient):
+
+    def start_debugging(self):
         started = False
         try:
             import rpdb2
             rpdb2.start_embedded_debugger('qgis', timeout=10.0)
             started = True
-            self._statusBar().showMessage(u"WinPDB debugging active")
         except:
             pass
         return started
 
-    def _statusBar(self):
-        return self.iface.mainWindow().statusBar()
+
+class Debugger:
+
+    def __init__(self):
+        self._debuggers = {}
+        self._debuggers[0] = EricClient()
+        self._debuggers[1] = PyDevClient()
+        self._debuggers[2] = WinPDBClient()
+
+    def client(self, debugger_id):
+        return self._debuggers[debugger_id]

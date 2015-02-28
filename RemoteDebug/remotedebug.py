@@ -67,7 +67,7 @@ class RemoteDebug:
         self.menu = self.tr(u'&Remote Debug')
         self.toolbar = self.iface.pluginToolBar()
 
-        self.debugger = Debugger(iface)
+        self.debugger = Debugger()
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -165,15 +165,14 @@ class RemoteDebug:
         self.add_action(
             icon_path,
             text=self.tr(u'Configuration'),
-            callback=self.run,
+            callback=self.configuration,
             add_to_toolbar=False,
             parent=self.iface.mainWindow())
         self.add_action(
             icon_path,
             text=self.tr(u'Remote Debug'),
-            callback=self.debugger.startDebugging,
+            callback=self.start_debugging,
             parent=self.iface.mainWindow())
-
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -183,10 +182,21 @@ class RemoteDebug:
                 action)
             self.iface.removeToolBarIcon(action)
 
+    def start_debugging(self):
+        debugger = self.debugger.client(
+            self.dlg.debugger_cbox.currentIndex())
+        self._statusBar().showMessage(u"Connecting to remote debugger...")
+        active = debugger.start_debugging()
+        self._statusBar().showMessage("")
+        if active:
+            self._push_message(
+                "RemoteDebug", u"Debugging connection activated", duration=2)
+        else:
+            self._push_message(
+                "RemoteDebug", u"Debugging connection failed", level=1)
 
-    def run(self):
-        """Run method that performs all the real work"""
-        # show the dialog
+    def configuration(self):
+        """Show configuration dialog"""
         self.dlg.show()
         # Run the dialog event loop
         result = self.dlg.exec_()
@@ -195,3 +205,9 @@ class RemoteDebug:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
             pass
+
+    def _statusBar(self):
+        return self.iface.mainWindow().statusBar()
+
+    def _push_message(self, title, text, level=0, duration=0):
+        self.iface.messageBar().pushMessage(title, text, level, duration)

@@ -8,8 +8,7 @@
 
 [general]
 name=Remote Debug
-qgisMinimumVersion=1.8
-qgisMaximumVersion=2.99
+qgisMinimumVersion=2.0
 description=Start Python remote debugger from QGIS plugin
 version=0.3.0
 author=Pirmin Kalberer & Dr. Horst Düster / Sourcepole AG
@@ -19,7 +18,10 @@ email=pka@sourcepole.ch
 
 # Recommended items:
 
-changelog=0.3.0
+changelog=0.4.0
+        -Configuration dialog
+        -Use external PyDev library
+    0.3.0
         -Initial WinPDB support
         -PyDev updated
     0.2.0
