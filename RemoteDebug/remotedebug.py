@@ -27,6 +27,7 @@ import resources_rc
 # Import the code for the dialog
 from remotedebug_dialog import RemoteDebugDialog
 from debugger import Debugger
+from pyqtconfig import QSettingsManager, ConfigManager
 import os.path
 
 
@@ -173,6 +174,12 @@ class RemoteDebug:
             text=self.tr(u'Remote Debug'),
             callback=self.start_debugging,
             parent=self.iface.mainWindow())
+
+        self._settings = QSettingsManager()
+        self._settings.add_handler(
+            'RemoteDebug/debugger', self.dlg.debugger_cbox)
+        self._settings.add_handler(
+            'RemoteDebug/pydev_path', self.dlg.pydev_path_ledit)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""

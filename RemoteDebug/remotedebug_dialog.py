@@ -42,7 +42,7 @@ class RemoteDebugDialog(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
 
     @pyqtSlot(int)
-    def on_debugger_cbox_activated(self, entry):
+    def on_debugger_cbox_currentIndexChanged(self, entry):
         self.pydevd_frm.setEnabled(entry == 1)
 
     def debugger_config(self):
