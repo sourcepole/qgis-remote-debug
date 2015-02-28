@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/remotedebug" >
+    <qresource prefix="/plugins/RemoteDebug" >
         <file>icon.png</file>
     </qresource>
 </RCC>
