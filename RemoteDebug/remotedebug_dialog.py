@@ -25,6 +25,7 @@ import os
 
 from PyQt4 import QtGui, uic
 from PyQt4.QtCore import Qt, pyqtSlot
+from PyQt4.QtGui import QFileDialog
 from debugger import Debugger
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -43,6 +44,15 @@ class RemoteDebugDialog(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
         self._plugin = plugin
         self._debugger = Debugger()
+
+    @pyqtSlot()
+    def on_pydevd_path_but_clicked(self):
+        pydevd_path = QFileDialog.getExistingDirectory(
+            None, "Select pydev directory containing pydevd.py",
+            self.pydev_path_ledit.text())
+        if not pydevd_path:
+            return  # dialog canceled
+        self.pydev_path_ledit.setText(pydevd_path)
 
     @pyqtSlot()
     def on_connect_but_clicked(self):
