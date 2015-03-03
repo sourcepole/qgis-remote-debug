@@ -24,14 +24,15 @@
 import os
 
 from PyQt4 import QtGui, uic
-from PyQt4.QtCore import pyqtSlot
+from PyQt4.QtCore import Qt, pyqtSlot
+from debugger import Debugger
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'remotedebug_dialog_base.ui'))
 
 
 class RemoteDebugDialog(QtGui.QDialog, FORM_CLASS):
-    def __init__(self, parent=None):
+    def __init__(self, plugin, parent=None):
         """Constructor."""
         super(RemoteDebugDialog, self).__init__(parent)
         # Set up the user interface from Designer.
@@ -40,10 +41,30 @@ class RemoteDebugDialog(QtGui.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+        self._plugin = plugin
+        self._debugger = Debugger()
 
-    @pyqtSlot(int)
-    def on_debugger_cbox_currentIndexChanged(self, entry):
-        self.pydevd_frm.setEnabled(entry == 1)
+    @pyqtSlot()
+    def on_connect_but_clicked(self):
+        self.setCursor(Qt.WaitCursor)
+        try:
+            self.start_debugging()
+        finally:
+            self.unsetCursor()
 
-    def debugger_config(self):
+    def start_debugging(self):
+        debugger = self._debugger.client(
+            self.debugger_cbox.currentIndex())
+        self._plugin.statusBar().showMessage(u"Connecting to remote debugger...")
+        active = debugger.start_debugging(self._debugger_config())
+        self._plugin.statusBar().showMessage("")
+        if active:
+            self.accept()
+            self._plugin.push_message(
+                u"Debugging connection activated", duration=2)
+        else:
+            self._plugin.push_message(
+                u"Debugging connection failed", level=1, duration=2)
+
+    def _debugger_config(self):
         return {'pydev_path': self.pydev_path_ledit.text()}

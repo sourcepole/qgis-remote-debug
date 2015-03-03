@@ -78,9 +78,9 @@ class Debugger:
 
     def __init__(self):
         self._debuggers = {}
-        self._debuggers[0] = EricClient()
-        self._debuggers[1] = PyDevClient()
-        self._debuggers[2] = WinPDBClient()
+        self._debuggers[0] = PyDevClient()
+        self._debuggers[1] = WinPDBClient()
+        self._debuggers[2] = EricClient()
 
     def client(self, debugger_id):
         return self._debuggers[debugger_id]

@@ -26,7 +26,6 @@ from PyQt4.QtGui import QAction, QIcon
 import resources_rc
 # Import the code for the dialog
 from remotedebug_dialog import RemoteDebugDialog
-from debugger import Debugger
 from pyqtconfig import QSettingsManager, ConfigManager
 import os.path
 
@@ -61,14 +60,12 @@ class RemoteDebug:
                 QCoreApplication.installTranslator(self.translator)
 
         # Create the dialog (after translation) and keep reference
-        self.dlg = RemoteDebugDialog()
+        self.dlg = RemoteDebugDialog(self)
 
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Remote Debug')
         self.toolbar = self.iface.pluginToolBar()
-
-        self.debugger = Debugger()
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -165,14 +162,8 @@ class RemoteDebug:
         icon_path = ':/plugins/RemoteDebug/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'Configuration'),
-            callback=self.configuration,
-            add_to_toolbar=False,
-            parent=self.iface.mainWindow())
-        self.add_action(
-            icon_path,
             text=self.tr(u'Remote Debug'),
-            callback=self.start_debugging,
+            callback=self.run,
             parent=self.iface.mainWindow())
 
         self._settings = QSettingsManager()
@@ -189,32 +180,17 @@ class RemoteDebug:
                 action)
             self.iface.removeToolBarIcon(action)
 
-    def start_debugging(self):
-        debugger = self.debugger.client(
-            self.dlg.debugger_cbox.currentIndex())
-        self._statusBar().showMessage(u"Connecting to remote debugger...")
-        active = debugger.start_debugging(self.dlg.debugger_config())
-        self._statusBar().showMessage("")
-        if active:
-            self._push_message(
-                "RemoteDebug", u"Debugging connection activated", duration=2)
-        else:
-            self._push_message(
-                "RemoteDebug", u"Debugging connection failed", level=1)
-
-    def configuration(self):
-        """Show configuration dialog"""
+    def run(self):
+        """Show debugger dialog"""
         self.dlg.show()
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
             pass
 
-    def _statusBar(self):
+    def statusBar(self):
         return self.iface.mainWindow().statusBar()
 
-    def _push_message(self, title, text, level=0, duration=0):
+    def push_message(self, text, title="RemoteDebug", level=0, duration=0):
         self.iface.messageBar().pushMessage(title, text, level, duration)
