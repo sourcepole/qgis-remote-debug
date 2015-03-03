@@ -41,7 +41,7 @@ SOURCES = \
 	remotedebug.py \
 	remotedebug_dialog.py
 
-PLUGINNAME = RemoteDebug
+PLUGINNAME = remotedebug
 
 PY_FILES = \
 	remotedebug.py \
@@ -63,7 +63,7 @@ PEP8EXCLUDE=pydev,resources_rc.py,conf.py,third_party,ui
 
 HELP = help/build/html
 
-PLUGIN_UPLOAD = $(c)/plugin_upload.py
+PLUGIN_UPLOAD = $(CURDIR)/plugin_upload.py
 
 RESOURCE_SRC=$(shell grep '^ *<file' resources.qrc | sed 's@</file>@@g;s/.*>//g' | tr '\n' ' ')
 
@@ -155,7 +155,8 @@ package: compile
 	git archive --prefix=$(PLUGINNAME)/ -o $(PLUGINNAME).zip $(VERSION)
 	echo "Created package: $(PLUGINNAME).zip"
 
-upload: zip
+#upload: zip
+upload:
 	@echo
 	@echo "-------------------------------------"
 	@echo "Uploading plugin to QGIS Plugin repo."
@@ -224,3 +225,7 @@ pep8:
 	@echo "-----------"
 	@echo "Ignored in PEP8 check:"
 	@echo $(PEP8EXCLUDE)
+
+# Publish package to plugins.qgis.org:
+# make package VERSION=master
+# make upload

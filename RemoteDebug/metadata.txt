@@ -9,16 +9,17 @@
 [general]
 name=Remote Debug
 qgisMinimumVersion=2.0
-description=Start Python remote debugger from QGIS plugin
-version=0.3.0
-author=Pirmin Kalberer & Dr. Horst Düster / Sourcepole AG
+description=Connect a running QGIS plugin to a Python remote debugger
+version=0.4.0
+author=Pirmin Kalberer & Dr. Horst Düster, Sourcepole AG
 email=pka@sourcepole.ch
 
 # End of mandatory metadata
 
 # Recommended items:
 
-changelog=0.4.0
+changelog=
+    0.4.0
         -Configuration dialog
         -Use external PyDev library
     0.3.0
@@ -27,7 +28,7 @@ changelog=0.4.0
     0.2.0
         -Compatibility with SIP API V2
     0.1.0
-    -First release
+        -First release
 
 # Tags are comma separated with spaces allowed
 tags=debugging,development,tools
@@ -42,4 +43,3 @@ experimental=True
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
-
