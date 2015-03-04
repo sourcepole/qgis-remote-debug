@@ -33,14 +33,14 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 
 class RemoteDebugDialog(QtGui.QDialog, FORM_CLASS):
+
     def __init__(self, plugin, parent=None):
         """Constructor."""
         super(RemoteDebugDialog, self).__init__(parent)
         # Set up the user interface from Designer.
         # After setupUI you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see
-        # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
-        # #widgets-and-dialogs-with-auto-connect
+        # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html#widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
         self._plugin = plugin
         self._debugger = Debugger()
@@ -65,7 +65,8 @@ class RemoteDebugDialog(QtGui.QDialog, FORM_CLASS):
     def start_debugging(self):
         debugger = self._debugger.client(
             self.debugger_cbox.currentIndex())
-        self._plugin.statusBar().showMessage(u"Connecting to remote debugger...")
+        self._plugin.statusBar().showMessage(
+            u"Connecting to remote debugger...")
         active = debugger.start_debugging(self._debugger_config())
         self._plugin.statusBar().showMessage("")
         if active:
