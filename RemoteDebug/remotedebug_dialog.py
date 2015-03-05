@@ -24,8 +24,9 @@
 import os
 
 from PyQt4 import QtGui, uic
-from PyQt4.QtCore import Qt, pyqtSlot
+from PyQt4.QtCore import Qt, pyqtSlot, QPoint, QPointF, QDate, QTime, QDir, QFile, QUrl
 from PyQt4.QtGui import QFileDialog
+from qgis.core import QgsApplication
 from debugger import Debugger
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -64,7 +65,23 @@ class RemoteDebugDialog(QtGui.QDialog, FORM_CLASS):
 
     @pyqtSlot()
     def on_exception_but_clicked(self):
-        raise Exception()
+        #Local vars for testing value display in debugger
+        t01 = QgsApplication.pluginPath()
+        t02 = QgsApplication.svgPaths()
+        #t03 = QChar('x')
+        t04 = QPoint(4, 5)
+        t05 = QPointF(4.1, 5.1)
+        t06 = QDate()
+        t07 = QTime()
+        t08 = QDir()
+        t09 = QFile()
+        t10 = QUrl()
+
+        x01 = 42
+        x02 = 'fortytwo'
+
+        raise Exception(
+            "Exception raised. Check local variables in your debugger.")
 
     def start_debugging(self):
         debugger = self._debugger.client(
