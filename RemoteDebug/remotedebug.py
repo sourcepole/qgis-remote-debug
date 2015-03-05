@@ -26,7 +26,7 @@ from PyQt4.QtGui import QAction, QIcon
 import resources_rc
 # Import the code for the dialog
 from remotedebug_dialog import RemoteDebugDialog
-from pyqtconfig import QSettingsManager, ConfigManager
+from pyqtconfig import QSettingsManager
 import os.path
 
 

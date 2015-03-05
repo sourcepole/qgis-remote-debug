@@ -62,6 +62,10 @@ class RemoteDebugDialog(QtGui.QDialog, FORM_CLASS):
         finally:
             self.unsetCursor()
 
+    @pyqtSlot()
+    def on_exception_but_clicked(self):
+        raise Exception()
+
     def start_debugging(self):
         debugger = self._debugger.client(
             self.debugger_cbox.currentIndex())
