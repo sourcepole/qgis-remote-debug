@@ -9,9 +9,10 @@
 [general]
 name=Remote Debug
 qgisMinimumVersion=2.0
+qgisMaximumVersion=3.99
 description=Connect a running QGIS plugin to a Python remote debugger
-version=0.4.1
-author=Pirmin Kalberer & Dr. Horst Düster, Sourcepole AG
+version=0.4.2
+author=Pirmin Kalberer & Dr. Horst Düster, Sourcepole AG; Reiner Borchert, Hansa Luftbild AG (v0.4.2)
 email=pka@sourcepole.ch
 
 # End of mandatory metadata
@@ -19,6 +20,9 @@ email=pka@sourcepole.ch
 # Recommended items:
 
 changelog=
+    0.4.2
+        -modified for Python3, PyQT5, QGIS3
+        by Reiner Borchert, Hansa Luftbild AG, borchert@hansaluftbild.de
     0.4.1
         -Exception button
         -Code cleanup

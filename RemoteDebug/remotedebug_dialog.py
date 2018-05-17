@@ -19,21 +19,32 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+
+/***************************************************************************
+ Modified for Python3, PyQT5, QGIS3
+        by Reiner Borchert, Hansa Luftbild AG, borchert@hansaluftbild.de
+        in May 2018
+ 
 """
 
+from sys import version_info
+if version_info < (3, 0):
+    from PyQt4 import QtGui, uic
+    from PyQt4.QtCore import Qt, pyqtSlot
+    from PyQt4.QtGui import QDialog, QFileDialog   
+else:
+    from PyQt5 import QtGui, uic
+    from PyQt5.QtCore import Qt, pyqtSlot
+    from PyQt5.QtWidgets import QDialog, QFileDialog
+    
 import os
-
-from PyQt4 import QtGui, uic
-from PyQt4.QtCore import Qt, pyqtSlot, QPoint, QPointF, QDate, QTime, QDir, QFile, QUrl
-from PyQt4.QtGui import QFileDialog
-from qgis.core import QgsApplication
-from debugger import Debugger
+from .debugger import Debugger
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'remotedebug_dialog_base.ui'))
 
 
-class RemoteDebugDialog(QtGui.QDialog, FORM_CLASS):
+class RemoteDebugDialog(QDialog, FORM_CLASS):
 
     def __init__(self, plugin, parent=None):
         """Constructor."""
@@ -65,23 +76,7 @@ class RemoteDebugDialog(QtGui.QDialog, FORM_CLASS):
 
     @pyqtSlot()
     def on_exception_but_clicked(self):
-        #Local vars for testing value display in debugger
-        t01 = QgsApplication.pluginPath()
-        t02 = QgsApplication.svgPaths()
-        #t03 = QChar('x')
-        t04 = QPoint(4, 5)
-        t05 = QPointF(4.1, 5.1)
-        t06 = QDate()
-        t07 = QTime()
-        t08 = QDir()
-        t09 = QFile()
-        t10 = QUrl()
-
-        x01 = 42
-        x02 = 'fortytwo'
-
-        raise Exception(
-            "Exception raised. Check local variables in your debugger.")
+        raise Exception()
 
     def start_debugging(self):
         debugger = self._debugger.client(

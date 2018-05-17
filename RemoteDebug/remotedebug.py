@@ -19,15 +19,32 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+ 
+/***************************************************************************
+ Modified for Python3, PyQT5, QGIS3
+        by Reiner Borchert, Hansa Luftbild AG, borchert@hansaluftbild.de
+        in May 2018
+ 
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon
-# Initialize Qt resources from file resources.py
-import resources_rc
-# Import the code for the dialog
-from remotedebug_dialog import RemoteDebugDialog
-from pyqtconfig import QSettingsManager
+
+from sys import version_info 
+if version_info < (3, 0):
+    from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+    from PyQt4.QtGui import QAction, QIcon
+    # Initialize Qt resources from file resources_rc.py
+    from .resources_rc import *
+else:
+    from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+    from PyQt5.QtWidgets import QAction
+    from PyQt5.QtGui import QIcon
+    # Initialize Qt resources from file resources5.py
+    from .resources5 import *
+
 import os.path
+
+# Import the code for the dialog
+from .remotedebug_dialog import RemoteDebugDialog
+from .pyqtconfig import QSettingsManager
 
 
 class RemoteDebug:
