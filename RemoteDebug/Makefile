@@ -52,9 +52,9 @@ UI_FILES = remotedebug_dialog_base.ui
 
 EXTRAS = icon.png metadata.txt
 
-COMPILED_RESOURCE_FILES = resources_rc.py
+COMPILED_RESOURCE_FILES = resources_rc.py resources5.py
 
-PEP8EXCLUDE=pydev,resources_rc.py,conf.py,third_party,ui
+PEP8EXCLUDE=pydev,resources5.py,resources_rc.py,conf.py,third_party,ui
 
 
 #################################################
@@ -75,6 +75,9 @@ compile: $(COMPILED_RESOURCE_FILES)
 
 %_rc.py : %.qrc $(RESOURCES_SRC)
 	pyrcc4 -o $*_rc.py  $<
+
+resources5.py: resources.qrc $(RESOURCES_SRC)
+	pyrcc5 -o $@  $<
 
 %.qm : %.ts
 	$(LRELEASE) $<

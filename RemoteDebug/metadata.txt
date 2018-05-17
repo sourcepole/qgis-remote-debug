@@ -1,11 +1,3 @@
-# This file contains metadata for your plugin. Since 
-# version 2.0 of QGIS this is the proper way to supply 
-# information about a plugin. The old method of 
-# embedding metadata in __init__.py will 
-# is no longer supported since version 2.0.
-
-# This file should be included when you package your plugin.# Mandatory items:
-
 [general]
 name=Remote Debug
 qgisMinimumVersion=2.0
@@ -14,10 +6,6 @@ description=Connect a running QGIS plugin to a Python remote debugger
 version=0.4.2
 author=Pirmin Kalberer & Dr. Horst Düster, Sourcepole AG; Reiner Borchert, Hansa Luftbild AG (v0.4.2)
 email=pka@sourcepole.ch
-
-# End of mandatory metadata
-
-# Recommended items:
 
 changelog=
     0.4.2
@@ -37,16 +25,12 @@ changelog=
     0.1.0
         -First release
 
-# Tags are comma separated with spaces allowed
 tags=debugging,development,tools
 
 homepage=https://github.com/sourcepole/qgis-remote-debug
-tracker=http://hub.qgis.org/projects/remotedebug/issues
+tracker=https://github.com/sourcepole/qgis-remote-debug/issues
 repository=https://github.com/sourcepole/qgis-remote-debug
 category=Plugins
 icon=icon.png
-# experimental flag
 experimental=True
-
-# deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False

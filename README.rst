@@ -26,7 +26,7 @@ Click Plugins > Remote Debug > Remote Debug, select your debugger and follow the
 License
 -------
 
-qgis-remote-debug is Copyright © 2012-2015 Sourcepole AG. It is free software,
+qgis-remote-debug is Copyright © 2012-2018 Sourcepole AG. It is free software,
 and may be redistributed under the terms specified in the LICENSE.txt
 file.
 
