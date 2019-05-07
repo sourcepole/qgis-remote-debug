@@ -40,7 +40,8 @@ else:
     # Initialize Qt resources from file resources5.py
     from .resources5 import *
 
-import os.path
+import os
+import sys
 
 # Import the code for the dialog
 from .remotedebug_dialog import RemoteDebugDialog
@@ -83,6 +84,16 @@ class RemoteDebug:
         self.actions = []
         self.menu = self.tr(u'&Remote Debug')
         self.toolbar = self.iface.pluginToolBar()
+
+        # Using the remote debugger in Windows, it appears that sys.stdin etc can be None
+        # According to:
+        # https://stackoverflow.com/questions/17458728/when-is-sys-stdin-none-in-python
+        # you can assign file descriptors to them in the following way (tested to work on Win10)
+        if sys.stdin is None or sys.stdout is None or sys.stderr is None:
+            for _name in ('stdin', 'stdout', 'stderr'):
+                if getattr(sys, _name) is None:
+                    setattr(sys, _name, open(os.devnull, 'r' if _name == 'stdin' else 'w'))
+            del _name # clean up this module's name space a little (optional)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
