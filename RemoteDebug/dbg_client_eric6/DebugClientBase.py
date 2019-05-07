@@ -22,20 +22,20 @@ import signal
 import time
 
 
-import DebugClientCapabilities
-import DebugVariables
-from DebugBase import setRecursionLimit, printerr   # __IGNORE_WARNING__
-from AsyncFile import AsyncFile, AsyncPendingWrite
-from DebugConfig import ConfigVarTypeStrings
-from FlexCompleter import Completer
-from DebugUtilities import prepareJsonCommand
-from BreakpointWatch import Breakpoint, Watch
+from . import DebugClientCapabilities
+from . import DebugVariables
+from .DebugBase import setRecursionLimit, printerr   # __IGNORE_WARNING__
+from .AsyncFile import AsyncFile, AsyncPendingWrite
+from .DebugConfig import ConfigVarTypeStrings
+from .FlexCompleter import Completer
+from .DebugUtilities import prepareJsonCommand
+from .BreakpointWatch import Breakpoint, Watch
 
 if sys.version_info[0] == 2:
     from inspect import getargvalues, formatargvalues
 else:
     unichr = chr
-    from DebugUtilities import getargvalues, formatargvalues
+    from .DebugUtilities import getargvalues, formatargvalues
 
 DebugClientInstance = None
 

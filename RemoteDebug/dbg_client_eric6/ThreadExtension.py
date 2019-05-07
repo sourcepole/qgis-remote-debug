@@ -18,7 +18,7 @@ else:
 
 import threading
 
-from DebugBase import DebugBase
+from .DebugBase import DebugBase
 
 _qtThreadNumber = 1
 

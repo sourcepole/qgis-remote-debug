@@ -10,7 +10,7 @@ debugger.
 
 import socket
 
-from DebugUtilities import prepareJsonCommand
+from .DebugUtilities import prepareJsonCommand
 
 try:
     unicode

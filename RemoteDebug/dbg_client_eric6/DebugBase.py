@@ -16,14 +16,14 @@ import ctypes
 import time
 from inspect import CO_GENERATOR
 
-from BreakpointWatch import Breakpoint, Watch
+from .BreakpointWatch import Breakpoint, Watch
 
 if sys.version_info[0] == 2:
     import thread as _thread
     from inspect import getargvalues, formatargvalues
 else:
     import _thread
-    from DebugUtilities import getargvalues, formatargvalues
+    from .DebugUtilities import getargvalues, formatargvalues
     unicode = str
     basestring = str
 

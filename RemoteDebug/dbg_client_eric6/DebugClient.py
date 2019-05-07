@@ -7,9 +7,9 @@
 Module implementing the standard debug client.
 """
 
-from DebugBase import DebugBase
-from DebugClientBase import DebugClientBase
-from ThreadExtension import ThreadExtension
+from .DebugBase import DebugBase
+from .DebugClientBase import DebugClientBase
+from .ThreadExtension import ThreadExtension
 
 
 class DebugClient(DebugClientBase, DebugBase, ThreadExtension):
