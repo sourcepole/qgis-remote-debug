@@ -195,6 +195,8 @@ class RemoteDebug:
                 self.tr(u'&Remote Debug'),
                 action)
             self.iface.removeToolBarIcon(action)
+        self.dlg.hide()
+        del self.dlg
 
     def run(self):
         """Show debugger dialog"""
