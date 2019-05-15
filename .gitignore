@@ -27,3 +27,7 @@ pip-log.txt
 .mr.developer.cfg
 
 *.zip
+
+#Eric6 ide
+.eric6project
+*.e4p

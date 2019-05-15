@@ -30,6 +30,21 @@ class DebuggerClient:
     def start_debugging(self, config=None):
         raise NotImplementedError
 
+class Eric6Client(DebuggerClient):
+
+    def start_debugging(self, config=None):
+        started = False
+        try:
+            from .dbg_client_eric6.DebugClient import DebugClient
+            DBG = DebugClient()
+            DBG.startDebugger(
+                host='localhost', filename='', port=42424,
+                exceptions=True, enableTrace=True, redirect=True)
+            started = True
+        except Exception as e:
+            print('Exception in Eric6Client.start_debugging: {}'.format(e))
+            pass
+        return started
 
 class EricClient(DebuggerClient):
 
@@ -81,6 +96,7 @@ class Debugger:
         self._debuggers[0] = PyDevClient()
         self._debuggers[1] = WinPDBClient()
         self._debuggers[2] = EricClient()
+        self._debuggers[3] = Eric6Client()
 
     def client(self, debugger_id):
         return self._debuggers[debugger_id]
