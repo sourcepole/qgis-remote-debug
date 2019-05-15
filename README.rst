@@ -14,7 +14,7 @@ The following debuggers are supported:
 
    Winpdb is a platform independent GPL Python debugger with support for multiple threads, namespace modification, embedded debugging, encrypted communication and is up to 20 times faster than pdb.
 
--  `Eric`_ 4
+-  `Eric`_ 6
 
    Eric is a full featured Python and Ruby editor and IDE, written in Python. It is based on the cross platform Qt gui toolkit, integrating the highly flexible Scintilla editor control.
 
